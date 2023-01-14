@@ -14,7 +14,7 @@
 ?>
 			</main><!-- #main -->
 		</div><!-- #primary -->
-	</div><!-- #content -->
+	</div><!-- #content-- -->
 
 	<?php get_template_part( 'template-parts/footer/footer-widgets' ); ?>
 
