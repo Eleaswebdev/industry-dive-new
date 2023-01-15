@@ -122,8 +122,30 @@ add_action( 'after_setup_theme', 'industry_drive_content_width', 0 );
 function industry_drive_widgets_init() {
 	register_sidebar(
 		array(
-			'name'          => esc_html__( 'Sidebar', 'industry-drive' ),
-			'id'            => 'sidebar-1',
+			'name'          => esc_html__( 'Newsletter Sidebar', 'industry-drive' ),
+			'id'            => 'newsletter',
+			'description'   => esc_html__( 'Add widgets here.', 'industry-drive' ),
+			'before_widget' => '<section id="%1$s" class="widget %2$s">',
+			'after_widget'  => '</section>',
+			'before_title'  => '<h2 class="widget-title">',
+			'after_title'   => '</h2>',
+		)
+	);
+	register_sidebar(
+		array(
+			'name'          => esc_html__( 'Footer Menu Sidebar', 'industry-drive' ),
+			'id'            => 'footer_menu',
+			'description'   => esc_html__( 'Add widgets here.', 'industry-drive' ),
+			'before_widget' => '<section id="%1$s" class="widget %2$s">',
+			'after_widget'  => '</section>',
+			'before_title'  => '<h2 class="widget-title">',
+			'after_title'   => '</h2>',
+		)
+	);
+	register_sidebar(
+		array(
+			'name'          => esc_html__( 'Copyright Widget', 'industry-drive' ),
+			'id'            => 'copyright_widget',
 			'description'   => esc_html__( 'Add widgets here.', 'industry-drive' ),
 			'before_widget' => '<section id="%1$s" class="widget %2$s">',
 			'after_widget'  => '</section>',
@@ -138,6 +160,15 @@ add_action( 'widgets_init', 'industry_drive_widgets_init' );
  * Enqueue scripts and styles.
  */
 function industry_drive_scripts() {
+
+	wp_enqueue_script( 'jquery-js', get_template_directory_uri() . '/assets/js/vendor/jquery-3.5.1.js','','','true' );
+	//wp_enqueue_script( 'popper-js', '/https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js','','','true');
+	//wp_enqueue_script( 'bootstrap-js', get_template_directory_uri() . '/assets/js/vendor/bootstrap.js','','','true' );
+	wp_enqueue_script( 'jquery-ui-js', get_template_directory_uri() . '/assets/js/plugin/jquery-ui/jquery-ui.js','','','true' );
+
+
+	wp_enqueue_style( 'main-css', get_template_directory_uri() . '/assets/css/main.css', array(), '1.2', 'all');
+
 	wp_enqueue_style( 'industry-drive-style', get_stylesheet_uri(), array(), _S_VERSION );
 	wp_style_add_data( 'industry-drive-style', 'rtl', 'replace' );
 
@@ -148,6 +179,14 @@ function industry_drive_scripts() {
 	}
 }
 add_action( 'wp_enqueue_scripts', 'industry_drive_scripts' );
+
+function industry_drive_styles(){
+   wp_enqueue_style( 'font','https://fonts.googleapis.com/css2?family=Khand:wght@300;400;500;600;700&display=swap');
+   wp_enqueue_style( 'font-awesome','https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css');
+}
+add_action( 'wp_enqueue_scripts', 'industry_drive_styles' );
+
+
 
 /**
  * Implement the Custom Header feature.
@@ -165,6 +204,11 @@ require get_template_directory() . '/inc/template-tags.php';
 require get_template_directory() . '/inc/template-functions.php';
 
 /**
+ * Register Custom Navigation Walker
+ */
+require_once('inc/class-wp-bootstrap-navwalker.php');
+
+/**
  * Customizer additions.
  */
 require get_template_directory() . '/inc/customizer.php';
@@ -176,3 +220,92 @@ if ( defined( 'JETPACK__VERSION' ) ) {
 	require get_template_directory() . '/inc/jetpack.php';
 }
 
+
+//estimated reading time
+function reading_time() {
+	$content = get_post_field( 'post_content', $post->ID );
+	$word_count = str_word_count( strip_tags( $content ) );
+	$readingtime = ceil($word_count / 200);
+	
+	if ($readingtime == 1) {
+	$timer = " minute";
+	} else {
+	$timer = " minutes";
+	}
+	$totalreadingtime = $readingtime . $timer;
+	
+	return $totalreadingtime;
+}
+
+
+function bsubash_load_more_scripts() {
+	wp_enqueue_script('jquery');
+	wp_register_script( 'loadmore_script', get_stylesheet_directory_uri() . '/assets/js/functions.js', '','','true'  );
+	wp_localize_script( 'loadmore_script', 'loadmore_params', array(
+		'ajaxurl' => admin_url('admin-ajax.php'),
+	) );
+	
+
+ 	wp_enqueue_script( 'loadmore_script' );
+}
+ 
+add_action( 'wp_enqueue_scripts','bsubash_load_more_scripts' );
+
+function bsubash_loadmore_ajax_handler(){
+	$type = $_POST['type'];
+	$category = isset($_POST['category']) ? $_POST['category']: '';
+	$args['paged'] = $_POST['page'] + 1;
+	$args['post_status'] = 'publish';
+	$args['posts_per_page'] =  $_POST['limit'];
+	if($type == 'archive'){
+		$args['category_name'] = $category;
+	}
+	//var_dump($args);
+	query_posts( $args );
+
+	?>	
+
+   
+		<?php
+		$count = 7;  
+		if( have_posts() ) :
+			while(have_posts()): the_post();
+		?>
+		<div class="item_<?php echo $count;?> id_featured_body">
+		<?php
+                
+                   
+		$featured_url = wp_get_attachment_url( get_post_thumbnail_id($post->ID), 'thumbnail' );  ?>
+		<img src="<?php echo $featured_url; ?>">
+		<div class="id_featured_content">
+			<?php
+			$cat = get_the_category( $post->ID );
+			$posttags = get_the_tags();
+			foreach($cat as $cd){
+				foreach($posttags as $tag) {
+				echo "<h3 class='cat_name_$count'>LATEST ARTICLE | $tag->name</h3>";
+				}
+			}
+			?>
+			<h1 class="title_<?php echo $count; ?>"><a href="<?php echo the_permalink(); ?>"><?php echo the_title(); ?></h1>
+			<p class="subtitle_<?php echo $count; ?>"><span><a href=""><?php echo reading_time(); ?> read |</a></span><span><a href="<?php echo the_permalink(); ?>"> Read more</a></span></p>
+		</div>
+		<?php $count++; ?>
+		</div>
+    <?php 
+
+    endwhile;
+	endif;
+	?>		
+
+		
+
+		
+	
+   <?php 
+
+
+	die;
+}
+add_action('wp_ajax_loadmore','bsubash_loadmore_ajax_handler');
+add_action('wp_ajax_nopriv_loadmore','bsubash_loadmore_ajax_handler');
