@@ -8,8 +8,7 @@
  */
 
 ?>
-<div class="id_grid_container">
-<div class="id_row">
+
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 	<header class="entry-header">
 		<?php the_title( sprintf( '<h2 class="entry-title"><a href="%s" rel="bookmark">', esc_url( get_permalink() ) ), '</a></h2>' ); ?>
@@ -34,5 +33,5 @@
 		<?php industry_drive_entry_footer(); ?>
 	</footer><!-- .entry-footer -->
 </article><!-- #post-<?php the_ID(); ?> -->
-</div>
-</div>
+
+

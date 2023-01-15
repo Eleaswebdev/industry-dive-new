@@ -35,8 +35,15 @@ h1 {
     margin-right: auto;
     margin-left: auto;
 }
+@media (max-width: 649px) {
+  .id_header .column1, .id_header .column2, .id_header .column3 {
+    text-align: center !important;
+  }
+}
 @media (max-width: 768px) {
-  .id_row { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
+  
+  .id_row { 
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
   }
   .id_feature_container .id_row .item_3 {
     grid-column: 1 !important;
@@ -83,6 +90,12 @@ h1 {
 
 .search-results img {
   width: 100%;
+}
+.search-results .id_grid_container {
+
+}
+.search-results  .type-post {
+
 }
 .id_header .id_row{
   display: grid;

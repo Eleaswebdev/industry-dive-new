@@ -78,7 +78,7 @@
 			</nav>
 			
 			
-		</div><!-- .site-branding -->
+		</div><!-- .id_grid_container -->
 
 	</header><!-- #masthead -->
 
