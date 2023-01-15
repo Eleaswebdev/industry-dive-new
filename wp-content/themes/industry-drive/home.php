@@ -16,7 +16,9 @@ get_header();
 ?>
 
   <!-- /.main start  -->
-    <main class="main">  
+    <main class="main">
+
+    
     <!-- ============================
         START BANNER SECTION
     ============================== -->
@@ -33,6 +35,7 @@ get_header();
     $exclude[] = $post->ID; 
     $url = wp_get_attachment_url( get_post_thumbnail_id($post->ID), 'thumbnail' );        
      ?>
+     
     <section class="featured_banner_area" style="background-image: url('<?php echo $url; ?>');">
         <div class="featued_area id_grid_container">
 
@@ -45,16 +48,12 @@ get_header();
                 }
             }
                 ?>
-            
             <h1><a href="<?php echo the_permalink(); ?>"><?php echo the_title(); ?></h1>
             <p><span><a href=""><?php echo reading_time(); ?> read |</a></span><span><a href="<?php echo the_permalink(); ?>"> Read more <i class="fa fa-long-arrow-right"></i></a></span></p>
 
         </div>
     </section>
-    <?php
-        endwhile;
-        wp_reset_query();
-    ?>
+    <?php endwhile; wp_reset_query(); ?>
     <!-- ============================
         END BANNER SECTION
     ============================== -->
@@ -62,8 +61,6 @@ get_header();
     <!-- ============================
         START FEATURED SECTION
     ============================== -->
-  
-
     <section class="id_featured_area">
         <div class="id_grid_container id_feature_container">
         <div class="id_row">
@@ -91,6 +88,7 @@ get_header();
                     $featured_url = wp_get_attachment_url( get_post_thumbnail_id($post->ID), 'thumbnail' );  ?>
                     <img src="<?php echo $featured_url; ?>">
                     <div class="id_featured_content">
+                       
                     <?php
                         $cat = get_the_category( $post->ID );
                         $posttags = get_the_tags();
@@ -102,6 +100,7 @@ get_header();
                         ?>
                         <h1 class="title_<?php echo $count; ?>"><a href="<?php echo the_permalink(); ?>"><?php echo the_title(); ?></h1>
                         <p class="subtitle_<?php echo $count; ?>"><span><a href=""><?php echo reading_time(); ?> read |</a></span><span><a href="<?php echo the_permalink(); ?>"> Read more <i class="fa fa-long-arrow-right"></i></a></span></p>
+                   
                     </div>
                   
                 </div>
@@ -112,7 +111,6 @@ get_header();
             </div>
         </div>
     </section>
-
     <!-- ============================
         END FEATURED SECTION
     ============================== -->
@@ -170,8 +168,6 @@ get_header();
             </div>
         </div>
     </section>
-
-
     <!-- ============================
         END TRENDING SECTION
     ============================== -->
@@ -244,11 +240,8 @@ get_header();
         </div> <!-- end container -->
 
     </section>
-
- 
-
      <!-- ============================
-        START LATEST SECTION
+        END LATEST SECTION
     ============================== -->
 
    

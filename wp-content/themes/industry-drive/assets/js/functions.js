@@ -1,5 +1,37 @@
 $(document).ready(function(){
 
+    function headerFixed() {
+        var logoHeight = $('.header_logo').outerHeight();
+        var menuHeight = $('.id_grid_container').outerHeight();
+        if ($(window).scrollTop() > 300) {
+            $(".header").addClass("fixed-top");
+            $('.custom_height').css({
+                height: `${menuHeight}px`
+            })
+        } else {
+            $(".header").removeClass("fixed-top");
+            $('.custom_height').css({
+                height: 'auto'
+            })
+        }
+    }
+    $(window).on('scroll', function () {
+        headerFixed();
+    });
+
+    function resizeHeader() {
+        if (w > 1024) {
+            headerFixed();
+        } 
+    }
+    var w = $(window).width();
+    resizeHeader();
+
+    $(window).resize(function () {
+        headerFixed();
+        resizeHeader()
+    });
+
     
     $('.btn-load-more').click(function(e) {
 

@@ -162,36 +162,29 @@ add_action( 'widgets_init', 'industry_drive_widgets_init' );
 function industry_drive_scripts() {
 
 	wp_enqueue_script( 'jquery-js', get_template_directory_uri() . '/assets/js/vendor/jquery-3.5.1.js','','','true' );
-	//wp_enqueue_script( 'popper-js', '/https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js','','','true');
-	//wp_enqueue_script( 'bootstrap-js', get_template_directory_uri() . '/assets/js/vendor/bootstrap.js','','','true' );
+	wp_enqueue_script( 'slick-js', get_template_directory_uri() . '/assets/js/plugin/slick.min.js','','','true' );
 	wp_enqueue_script( 'jquery-ui-js', get_template_directory_uri() . '/assets/js/plugin/jquery-ui/jquery-ui.js','','','true' );
-
-
 	wp_enqueue_style( 'main-css', get_template_directory_uri() . '/assets/css/main.css', array(), '1.2', 'all');
 
 	wp_enqueue_style( 'industry-drive-style', get_stylesheet_uri(), array(), _S_VERSION );
 	wp_style_add_data( 'industry-drive-style', 'rtl', 'replace' );
 
-	wp_enqueue_script( 'industry-drive-navigation', get_template_directory_uri() . '/js/navigation.js', array(), _S_VERSION, true );
+	wp_enqueue_style( 'slick-css', get_template_directory_uri() . '/assets/css/slick.css', array(), '1.1', 'all');
+	wp_enqueue_style( 'slick-theme-css', get_template_directory_uri() . '/assets/css/slick-theme.css', array(), '1.1', 'all');
+	wp_enqueue_style( 'font','https://fonts.googleapis.com/css2?family=Khand:wght@300;400;500;600;700&display=swap');
+	wp_enqueue_style( 'font-awesome','https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css');
 
-	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
-		wp_enqueue_script( 'comment-reply' );
-	}
+	wp_enqueue_script('jquery');
+	wp_register_script( 'loadmore_script', get_stylesheet_directory_uri() . '/assets/js/functions.js', '','','true'  );
+	wp_localize_script( 'loadmore_script', 'loadmore_params', array(
+		'ajaxurl' => admin_url('admin-ajax.php'),
+	) );
+	
+
+ 	wp_enqueue_script( 'loadmore_script' );
 }
 add_action( 'wp_enqueue_scripts', 'industry_drive_scripts' );
 
-function industry_drive_styles(){
-   wp_enqueue_style( 'font','https://fonts.googleapis.com/css2?family=Khand:wght@300;400;500;600;700&display=swap');
-   wp_enqueue_style( 'font-awesome','https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css');
-}
-add_action( 'wp_enqueue_scripts', 'industry_drive_styles' );
-
-
-
-/**
- * Implement the Custom Header feature.
- */
-require get_template_directory() . '/inc/custom-header.php';
 
 /**
  * Custom template tags for this theme.
@@ -203,10 +196,6 @@ require get_template_directory() . '/inc/template-tags.php';
  */
 require get_template_directory() . '/inc/template-functions.php';
 
-/**
- * Register Custom Navigation Walker
- */
-require_once('inc/class-wp-bootstrap-navwalker.php');
 
 /**
  * Customizer additions.
@@ -214,14 +203,9 @@ require_once('inc/class-wp-bootstrap-navwalker.php');
 require get_template_directory() . '/inc/customizer.php';
 
 /**
- * Load Jetpack compatibility file.
+ * estimated reading time
  */
-if ( defined( 'JETPACK__VERSION' ) ) {
-	require get_template_directory() . '/inc/jetpack.php';
-}
 
-
-//estimated reading time
 function reading_time() {
 	$content = get_post_field( 'post_content', $post->ID );
 	$word_count = str_word_count( strip_tags( $content ) );
@@ -237,21 +221,11 @@ function reading_time() {
 	return $totalreadingtime;
 }
 
+/**
+ * load more functionality
+ */
 
-function bsubash_load_more_scripts() {
-	wp_enqueue_script('jquery');
-	wp_register_script( 'loadmore_script', get_stylesheet_directory_uri() . '/assets/js/functions.js', '','','true'  );
-	wp_localize_script( 'loadmore_script', 'loadmore_params', array(
-		'ajaxurl' => admin_url('admin-ajax.php'),
-	) );
-	
-
- 	wp_enqueue_script( 'loadmore_script' );
-}
- 
-add_action( 'wp_enqueue_scripts','bsubash_load_more_scripts' );
-
-function bsubash_loadmore_ajax_handler(){
+function id_loadmore_ajax_handler(){
 	$type = $_POST['type'];
 	$category = isset($_POST['category']) ? $_POST['category']: '';
 	$args['paged'] = $_POST['page'] + 1;
@@ -260,52 +234,40 @@ function bsubash_loadmore_ajax_handler(){
 	if($type == 'archive'){
 		$args['category_name'] = $category;
 	}
-	//var_dump($args);
 	query_posts( $args );
 
 	?>	
 
    
+	<?php
+	$count = 7;  
+	if( have_posts() ) :
+		while(have_posts()): the_post();
+	?>
+	<div class="item_<?php echo $count;?> id_featured_body">
+	<?php
+			
+				
+	$featured_url = wp_get_attachment_url( get_post_thumbnail_id($post->ID), 'thumbnail' );  ?>
+	<img src="<?php echo $featured_url; ?>">
+	<div class="id_featured_content">
 		<?php
-		$count = 7;  
-		if( have_posts() ) :
-			while(have_posts()): the_post();
-		?>
-		<div class="item_<?php echo $count;?> id_featured_body">
-		<?php
-                
-                   
-		$featured_url = wp_get_attachment_url( get_post_thumbnail_id($post->ID), 'thumbnail' );  ?>
-		<img src="<?php echo $featured_url; ?>">
-		<div class="id_featured_content">
-			<?php
-			$cat = get_the_category( $post->ID );
-			$posttags = get_the_tags();
-			foreach($cat as $cd){
-				foreach($posttags as $tag) {
-				echo "<h3 class='cat_name_$count'>LATEST ARTICLE | $tag->name</h3>";
-				}
+		$cat = get_the_category( $post->ID );
+		$posttags = get_the_tags();
+		foreach($cat as $cd){
+			foreach($posttags as $tag) {
+			echo "<h3 class='cat_name_$count'>LATEST ARTICLE | $tag->name</h3>";
 			}
-			?>
-			<h1 class="title_<?php echo $count; ?>"><a href="<?php echo the_permalink(); ?>"><?php echo the_title(); ?></h1>
-			<p class="subtitle_<?php echo $count; ?>"><span><a href=""><?php echo reading_time(); ?> read |</a></span><span><a href="<?php echo the_permalink(); ?>"> Read more</a></span></p>
-		</div>
-		<?php $count++; ?>
-		</div>
-    <?php 
-
-    endwhile;
-	endif;
-	?>		
-
-		
-
-		
-	
+		}
+		?>
+		<h1 class="title_<?php echo $count; ?>"><a href="<?php echo the_permalink(); ?>"><?php echo the_title(); ?></h1>
+		<p class="subtitle_<?php echo $count; ?>"><span><a href=""><?php echo reading_time(); ?> read |</a></span><span><a href="<?php echo the_permalink(); ?>"> Read more</a></span></p>
+	</div>
+	<?php $count++; ?>
+	</div>
+    <?php endwhile; endif; ?>		
    <?php 
-
-
 	die;
 }
-add_action('wp_ajax_loadmore','bsubash_loadmore_ajax_handler');
-add_action('wp_ajax_nopriv_loadmore','bsubash_loadmore_ajax_handler');
+add_action('wp_ajax_loadmore','id_loadmore_ajax_handler');
+add_action('wp_ajax_nopriv_loadmore','id_loadmore_ajax_handler');
